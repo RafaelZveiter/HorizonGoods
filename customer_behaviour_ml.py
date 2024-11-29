@@ -8,163 +8,121 @@ Original file is located at
 """
 
 import pandas as pd
-
-customers = pd.read_csv('Amazon Customer Behavior Survey.csv')
-
-customers.columns
-
-#customers_clean = customers[['age', 'Gender','Browsing_Frequency','Add_to_Cart_Browsing','Review_Reliability','Product_Search_Method','Saveforlater_Frequency','Purchase_Frequency' ]]
-
-customers_clean = customers[['age','Gender','Browsing_Frequency','Add_to_Cart_Browsing','Review_Reliability','Product_Search_Method','Saveforlater_Frequency','Purchase_Frequency' ]]
-
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, OneHotEncoder, LabelEncoder
-from sklearn.linear_model import LogisticRegression
-
-scaler = StandardScaler()
-ohe = OneHotEncoder(handle_unknown = 'ignore', sparse_output=False)
-lab = LabelEncoder()
-log_reg = LogisticRegression(max_iter=1_000)
-
-X = customers_clean.drop(columns = 'Purchase_Frequency')
-y = customers_clean['Purchase_Frequency']
-
-y_enc = lab.fit_transform(y)
-
-X_train, X_test, y_train, y_test = train_test_split(X, y_enc, test_size = 0.2, random_state = 42)
-
-X_train_num = X_train[['age']]
-X_train_cat = X_train.drop(columns = 'age')
-X_test_num = X_test[['age']]
-X_test_cat = X_test.drop(columns = 'age')
-
-
-X_train_num_scaled = scaler.fit_transform(X_train_num)
-X_test_num_scaled = scaler.transform(X_test_num)
-
-X_train_cat_scaled = ohe.fit_transform(X_train_cat)
-X_test_cat_scaled = ohe.transform(X_test_cat)
-
-X_train_num_scaled = pd.DataFrame(X_train_num_scaled, columns=['age_scaled'], index=X_train.index)
-X_train_cat_scaled = pd.DataFrame(X_train_cat_scaled, columns=ohe.get_feature_names_out(X_train_cat.columns), index=X_train.index)
-
-X_test_num_scaled = pd.DataFrame(X_test_num_scaled, columns=['age_scaled'], index=X_test.index)
-X_test_cat_scaled = pd.DataFrame(X_test_cat_scaled, columns=ohe.get_feature_names_out(X_test_cat.columns), index=X_test.index)
-
-X_train_scaled = pd.concat([X_train_num_scaled, X_train_cat_scaled], axis=1)
-X_test_scaled = pd.concat([X_test_num_scaled, X_test_cat_scaled], axis=1)
-
-log_reg.fit(X_train_scaled, y_train)
-
-y_pred = log_reg.predict(X_test_scaled)
-print(log_reg.score(X_test_scaled, y_test))
-
-lab.classes_
-
-pd.Series(y_enc).value_counts()
-
-y.value_counts()
-
-def predict_purchase_frequency (age,Gender,Browsing_Frequency,Add_to_Cart_Browsing,Review_Reliability,Product_Search_Method,Saveforlater_Frequency):
-  customer = pd.DataFrame({
-    "age": [age],
-    'Gender': [Gender],
-    "Browsing_Frequency": [Browsing_Frequency],
-    'Add_to_Cart_Browsing': [Add_to_Cart_Browsing],
-    "Review_Reliability": [Review_Reliability],
-    "Product_Search_Method":[Product_Search_Method],
-    'Saveforlater_Frequency': [Saveforlater_Frequency],
-  })
-  X_num = customer[['age']]
-  X_cat = customer.drop(columns= 'age')
-  X_num_scaled = scaler.transform(X_num)
-  X_cat_scaled = ohe.transform(X_cat)
-  X_num_scaled = pd.DataFrame(X_num_scaled, columns=['age_scaled'], index=X_num.index)
-  X_cat_scaled = pd.DataFrame(X_cat_scaled, columns=ohe.get_feature_names_out(X_cat.columns), index=X_cat.index)
-  X_scaled = pd.concat([X_num_scaled, X_cat_scaled], axis=1)
-
-  if log_reg.predict(X_scaled) == 0:
-    return "Purchase frequency: Few times a month"
-  elif log_reg.predict(X_scaled) == 1:
-    return 'Purchase frequency: Less than once a month'
-  elif log_reg.predict(X_scaled) == 2:
-    return 'Purchase frequency: Multiple times a week'
-  elif log_reg.predict(X_scaled) == 3:
-    return 'Purchase frequency: Once a month'
-  elif log_reg.predict(X_scaled) == 4:
-    return 'Purchase frequency: Once a week'
-
-# @title Texto de título padrão
-Age = 35 # @param {"type":"integer"}
-Gender = "Male" # @param {"type":"string"}
-Browsing_Frequency = "Few times a week" # @param {"type":"string"}
-Add_to_Cart_Browsing = "No" # @param {"type":"string"}
-Review_Reliability = "Moderately" # @param {"type":"string"}
-Product_Search_Method = "Keyword" # @param {"type":"string"}
-Saveforlater_Frequency = "Sometimes" # @param {"type":"string"}
-
-predict_purchase_frequency(Age,Gender,Browsing_Frequency,Add_to_Cart_Browsing,Review_Reliability,Product_Search_Method,Saveforlater_Frequency)
-
-#customers_clean_2 = customers[['age',
- #                              'Gender',
-  #                             'Browsing_Frequency',
-   #                            'Personalized_Recommendation_Frequency',
-    #                           'Review_Reliability',
-     #                          'Search_Result_Exploration',
-      #                         'Cart_Completion_Frequency',
-       #                        'Customer_Reviews_Importance',
-        #                       'Cart_Abandonment_Factors',
-         #                      'Purchase_Frequency',
-          #                     'Recommendation_Helpfulness',
-           #                    'Shopping_Satisfaction'
-            #                   ]]
-#customers_clean_3 = customers.drop(columns = ['Timestamp'])
-
-#X = customers_clean.drop(columns = 'Shopping_Satisfaction')
-#y = customers_clean['Shopping_Satisfaction']
-
-#y_enc = lab.fit_transform(y)
-
-#X_train, X_test, y_train, y_test = train_test_split(X, y_enc, test_size = 0.2, random_state = 42)
-
-#X_train_num = X_train[['age']]
-#X_train_cat = X_train.drop(columns = 'age')
-#X_test_num = X_test[['age']]
-#X_test_cat = X_test.drop(columns = 'age')
-
-
-#X_train_num_scaled = scaler.fit_transform(X_train_num)
-#X_test_num_scaled = scaler.transform(X_test_num)
-
-#X_train_cat_scaled = ohe.fit_transform(X_train_cat)
-#X_test_cat_scaled = ohe.transform(X_test_cat)
-
-#X_train_num_scaled = pd.DataFrame(X_train_num_scaled, columns=['age_scaled'], index=X_train.index)
-#X_train_cat_scaled = pd.DataFrame(X_train_cat_scaled, columns=ohe.get_feature_names_out(X_train_cat.columns), index=X_train.index)
-
-#X_test_num_scaled = pd.DataFrame(X_test_num_scaled, columns=['age_scaled'], index=X_test.index)
-#X_test_cat_scaled = pd.DataFrame(X_test_cat_scaled, columns=ohe.get_feature_names_out(X_test_cat.columns), index=X_test.index)
-
-#X_train_scaled = pd.concat([X_train_num_scaled, X_train_cat_scaled], axis=1)
-#X_test_scaled = pd.concat([X_test_num_scaled, X_test_cat_scaled], axis=1)
-
-#log_reg.fit(X_train_scaled, y_train)
-
-#y_pred = log_reg.predict(X_test_scaled)
-#print(log_reg.score(X_test_scaled, y_test))
 import streamlit as st
 
-genre = st.radio(
-    "What's your favorite movie genre",
-    [":rainbow[Comedy]", "***Drama***", "Documentary :movie_camera:"],
-    captions=[
-        "Laugh out loud.",
-        "Get the popcorn.",
-        "Never stop learning.",
-    ],
-)
+def main():
+    customers = pd.read_csv('Amazon Customer Behavior Survey.csv')
+    
+    customers.columns
+    
+    #customers_clean = customers[['age', 'Gender','Browsing_Frequency','Add_to_Cart_Browsing','Review_Reliability','Product_Search_Method','Saveforlater_Frequency','Purchase_Frequency' ]]
+    
+    customers_clean = customers[['age','Gender','Browsing_Frequency','Add_to_Cart_Browsing','Review_Reliability','Product_Search_Method','Saveforlater_Frequency','Purchase_Frequency' ]]
+    
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import StandardScaler, OneHotEncoder, LabelEncoder
+    from sklearn.linear_model import LogisticRegression
+    
+    scaler = StandardScaler()
+    ohe = OneHotEncoder(handle_unknown = 'ignore', sparse_output=False)
+    lab = LabelEncoder()
+    log_reg = LogisticRegression(max_iter=1_000)
+    
+    X = customers_clean.drop(columns = 'Purchase_Frequency')
+    y = customers_clean['Purchase_Frequency']
+    
+    y_enc = lab.fit_transform(y)
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y_enc, test_size = 0.2, random_state = 42)
+    
+    X_train_num = X_train[['age']]
+    X_train_cat = X_train.drop(columns = 'age')
+    X_test_num = X_test[['age']]
+    X_test_cat = X_test.drop(columns = 'age')
+    
+    
+    X_train_num_scaled = scaler.fit_transform(X_train_num)
+    X_test_num_scaled = scaler.transform(X_test_num)
+    
+    X_train_cat_scaled = ohe.fit_transform(X_train_cat)
+    X_test_cat_scaled = ohe.transform(X_test_cat)
+    
+    X_train_num_scaled = pd.DataFrame(X_train_num_scaled, columns=['age_scaled'], index=X_train.index)
+    X_train_cat_scaled = pd.DataFrame(X_train_cat_scaled, columns=ohe.get_feature_names_out(X_train_cat.columns), index=X_train.index)
+    
+    X_test_num_scaled = pd.DataFrame(X_test_num_scaled, columns=['age_scaled'], index=X_test.index)
+    X_test_cat_scaled = pd.DataFrame(X_test_cat_scaled, columns=ohe.get_feature_names_out(X_test_cat.columns), index=X_test.index)
+    
+    X_train_scaled = pd.concat([X_train_num_scaled, X_train_cat_scaled], axis=1)
+    X_test_scaled = pd.concat([X_test_num_scaled, X_test_cat_scaled], axis=1)
+    
+    log_reg.fit(X_train_scaled, y_train)
+    
+    y_pred = log_reg.predict(X_test_scaled)
+    print(log_reg.score(X_test_scaled, y_test))
+    
+    lab.classes_
+    
+    pd.Series(y_enc).value_counts()
+    
+    y.value_counts()
+    
+    def predict_purchase_frequency (age,Gender,Browsing_Frequency,Add_to_Cart_Browsing,Review_Reliability,Product_Search_Method,Saveforlater_Frequency):
+      customer = pd.DataFrame({
+        "age": [age],
+        'Gender': [Gender],
+        "Browsing_Frequency": [Browsing_Frequency],
+        'Add_to_Cart_Browsing': [Add_to_Cart_Browsing],
+        "Review_Reliability": [Review_Reliability],
+        "Product_Search_Method":[Product_Search_Method],
+        'Saveforlater_Frequency': [Saveforlater_Frequency],
+      })
+      X_num = customer[['age']]
+      X_cat = customer.drop(columns= 'age')
+      X_num_scaled = scaler.transform(X_num)
+      X_cat_scaled = ohe.transform(X_cat)
+      X_num_scaled = pd.DataFrame(X_num_scaled, columns=['age_scaled'], index=X_num.index)
+      X_cat_scaled = pd.DataFrame(X_cat_scaled, columns=ohe.get_feature_names_out(X_cat.columns), index=X_cat.index)
+      X_scaled = pd.concat([X_num_scaled, X_cat_scaled], axis=1)
+    
+      if log_reg.predict(X_scaled) == 0:
+        return "Purchase frequency: Few times a month"
+      elif log_reg.predict(X_scaled) == 1:
+        return 'Purchase frequency: Less than once a month'
+      elif log_reg.predict(X_scaled) == 2:
+        return 'Purchase frequency: Multiple times a week'
+      elif log_reg.predict(X_scaled) == 3:
+        return 'Purchase frequency: Once a month'
+      elif log_reg.predict(X_scaled) == 4:
+        return 'Purchase frequency: Once a week'
+    
+    # @title Texto de título padrão
+    Age = 35 # @param {"type":"integer"}
+    Gender = "Male" # @param {"type":"string"}
+    Browsing_Frequency = "Few times a week" # @param {"type":"string"}
+    Add_to_Cart_Browsing = "No" # @param {"type":"string"}
+    Review_Reliability = "Moderately" # @param {"type":"string"}
+    Product_Search_Method = "Keyword" # @param {"type":"string"}
+    Saveforlater_Frequency = "Sometimes" # @param {"type":"string"}
+    
+    res = predict_purchase_frequency(Age,Gender,Browsing_Frequency,Add_to_Cart_Browsing,Review_Reliability,Product_Search_Method,Saveforlater_Frequency)
+    if st.button("Predict"): 
+        print(res)
 
-if genre == ":rainbow[Comedy]":
-    st.write("You selected comedy.")
-else:
-    st.write("You didn't select comedy.")
+    genre = st.radio(
+        "What's your favorite movie genre",
+        [":rainbow[Comedy]", "***Drama***", "Documentary :movie_camera:"],
+        captions=[
+            "Laugh out loud.",
+            "Get the popcorn.",
+            "Never stop learning.",
+        ],
+    )
+    
+    if genre == ":rainbow[Comedy]":
+        st.write("You selected comedy.")
+    else:
+        st.write("You didn't select comedy.")
+
+if __name__=='__main__': 
+    main()
