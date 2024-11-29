@@ -9,6 +9,9 @@ Original file is located at
 
 import pandas as pd
 import streamlit as st
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, OneHotEncoder, LabelEncoder
+from sklearn.linear_model import LogisticRegression
 
 def main():
     customers = pd.read_csv('Amazon Customer Behavior Survey.csv')
@@ -18,10 +21,6 @@ def main():
     #customers_clean = customers[['age', 'Gender','Browsing_Frequency','Add_to_Cart_Browsing','Review_Reliability','Product_Search_Method','Saveforlater_Frequency','Purchase_Frequency' ]]
     
     customers_clean = customers[['age','Gender','Browsing_Frequency','Add_to_Cart_Browsing','Review_Reliability','Product_Search_Method','Saveforlater_Frequency','Purchase_Frequency' ]]
-    
-    from sklearn.model_selection import train_test_split
-    from sklearn.preprocessing import StandardScaler, OneHotEncoder, LabelEncoder
-    from sklearn.linear_model import LogisticRegression
     
     scaler = StandardScaler()
     ohe = OneHotEncoder(handle_unknown = 'ignore', sparse_output=False)
