@@ -9,7 +9,7 @@ Original file is located at
 
 import pandas as pd
 
-customers = pd.read_csv('/content/Amazon Customer Behavior Survey.csv')
+customers = pd.read_csv('Amazon Customer Behavior Survey.csv')
 
 customers.columns
 
