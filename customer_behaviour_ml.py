@@ -152,3 +152,19 @@ predict_purchase_frequency(Age,Gender,Browsing_Frequency,Add_to_Cart_Browsing,Re
 
 #y_pred = log_reg.predict(X_test_scaled)
 #print(log_reg.score(X_test_scaled, y_test))
+import streamlit as st
+
+genre = st.radio(
+    "What's your favorite movie genre",
+    [":rainbow[Comedy]", "***Drama***", "Documentary :movie_camera:"],
+    captions=[
+        "Laugh out loud.",
+        "Get the popcorn.",
+        "Never stop learning.",
+    ],
+)
+
+if genre == ":rainbow[Comedy]":
+    st.write("You selected comedy.")
+else:
+    st.write("You didn't select comedy.")
